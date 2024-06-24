@@ -58,41 +58,49 @@ function BoardsScreen() {
       <Box sx={{ width: "15%", margin: "10px" }}>
         <CreateBoardDialog createNewBoard={createBoard} />
       </Box>
-      {data.map((board) => {
-        return (
-          <Link to={`/${board.id}`} key={board.id}>
-            <Box
-              key={board.id}
-              sx={{
-                display: "flex",
-                width: "200px",
-                justifyContent: "flex-start",
-                alignItems: "baseline",
-                height: "100px",
-                border: "1px solid white",
-                borderRadius: "5px",
-
-                backgroundColor: "primary.main",
-                margin: 1,
-
-                boxShadow: 10,
-              }}
-            >
-              <Typography
-                variant="body1"
+      {data.length > 0 ? (
+        data.map((board) => {
+          return (
+            <Link to={`/${board.id}`} key={board.id}>
+              <Box
+                key={board.id}
                 sx={{
-                  color: "white",
-                  fontWeight: 700,
-                  textTransform: "none",
-                  padding: "5%",
+                  display: "flex",
+                  width: "200px",
+                  justifyContent: "flex-start",
+                  alignItems: "baseline",
+                  height: "100px",
+                  border: "1px solid white",
+                  borderRadius: "5px",
+
+                  backgroundColor: "primary.main",
+                  margin: 1,
+
+                  boxShadow: 10,
                 }}
               >
-                {board.name}
-              </Typography>
-            </Box>
-          </Link>
-        );
-      })}
+                <Typography
+                  variant="body1"
+                  sx={{
+                    color: "white",
+                    fontWeight: 700,
+                    textTransform: "none",
+                    padding: "5%",
+                  }}
+                >
+                  {board.name}
+                </Typography>
+              </Box>
+            </Link>
+          );
+        })
+      ) : (
+        <Typography
+          sx={{ fontSize: "30px", textAlign: "center", color: "black" }}
+        >
+          There are no boards{" "}
+        </Typography>
+      )}
     </Container>
   );
 }

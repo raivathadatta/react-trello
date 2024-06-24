@@ -7,7 +7,8 @@ import { createNewList } from "../data/create/create_api_calls";
 import FormInput from "./components/appbars/form/FormInput";
 import { deleteListByListId } from "../data/delete/delete_api_calls";
 import ListCardContainer from "./containers/CardContainer";
-
+import CircularProgress from "@mui/material/CircularProgress";
+import Snackbar from "@mui/material/Snackbar";
 function ListScreen() {
   let { boardId } = useParams();
   const [listData, setListData] = useState({});
@@ -20,9 +21,18 @@ function ListScreen() {
     const response = await getAllListsFromBoard(boardId);
     if (response.error) {
       console.log(response.error);
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        open={open}
+        onClose={handleClose}
+        message={response.error}
+        key={vertical + horizontal}
+      />;
+
       return;
     }
     const data = response.data;
+
     setListData(data);
     setLoader(false);
   };
@@ -33,6 +43,7 @@ function ListScreen() {
 
   const addNewList = async () => {
     setAddListInputVisibility(!addListInputVisibility);
+   
     const response = await createNewList(newListValue, boardId);
     if (response.error) {
       console.log(response.error);
@@ -62,7 +73,7 @@ function ListScreen() {
     setListData(listDataCopy);
   };
   if (loader) {
-    return <h1>loading</h1>;
+    return <CircularProgress color="success" />;
   }
   return (
     <>

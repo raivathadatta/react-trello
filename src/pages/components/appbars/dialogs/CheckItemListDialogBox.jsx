@@ -17,6 +17,7 @@ import { deleteCheckListById } from "../../../../data/delete/delete_api_calls";
 import { createCheckList } from "../../../../data/create/create_api_calls";
 // import CheckListDialogBox from "../../../containers/CheckListBox";
 import CheckListBox from "../../../containers/CheckListBox";
+import CircularProgress from "@mui/material/CircularProgress";
 
 function CheckListDialogBox({ deleteCardCallBack, name, cardId }) {
   const [open, setOpen] = useState(false);
@@ -53,9 +54,8 @@ function CheckListDialogBox({ deleteCardCallBack, name, cardId }) {
       console.log(response.error, "error");
       return;
     }
-   
-    setChecklist([...checkList,response.data]);
 
+    setChecklist([...checkList, response.data]);
   };
   const handleChange = (event) => {
     setInputValue(event.target.value);
@@ -88,13 +88,11 @@ function CheckListDialogBox({ deleteCardCallBack, name, cardId }) {
       .catch((error) => {
         console.log(error, "error");
       });
-
-  
   };
 
   //////////////// check items////////////////////////////
   const getCheckListItems = async (data) => {
-
+    setOpen(true);
     let temp = data.reduce((acc, item) => {
       acc.push(getCheckItemByListId(item.id));
       return acc;
@@ -104,12 +102,7 @@ function CheckListDialogBox({ deleteCardCallBack, name, cardId }) {
     const checkItems = response.map((item) => item.data);
     setCheckItems(checkItems);
     setLoading(false);
-    setOpen(true);
   };
-
-  if (loading) {
-    return <h1>loading</h1>;
-  }
 
   return (
     <>
@@ -137,26 +130,35 @@ function CheckListDialogBox({ deleteCardCallBack, name, cardId }) {
         </IconButton>
       </Box>
 
-      {
-        <Dialog open={open} onClose={handleClose}>
-          <DialogTitle>
-            <Box>
-              <Typography>{name}</Typography>
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>
+          <Box>
+            <Typography>{name}</Typography>
+          </Box>
+        </DialogTitle>
+
+        <Container
+          sx={{
+            width: "500px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            backgroundColor: "lightgrey",
+            // justifyContent: "center",
+            justifyItems: "center",
+            padding: 1,
+            borderRadius: 1,
+            boxShadow: 2,
+            // minHeight: "500px",
+            height: "fitContent",
+          }}
+        >
+          {loading ? (
+            <Box sx={{height:"500px",marginTop:"40%"}}>
+              <CircularProgress  />
             </Box>
-          </DialogTitle>
-          <Container
-            sx={{
-              width: "500px",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              backgroundColor: "lightgrey",
-              padding: 1,
-              borderRadius: 1,
-              boxShadow: 2,
-            }}
-          >
-            {checkList.map((item, index) => {
+          ) : (
+            checkList.map((item, index) => {
               return (
                 <CheckListBox
                   key={item.id}
@@ -166,34 +168,34 @@ function CheckListDialogBox({ deleteCardCallBack, name, cardId }) {
                   cardId={cardId}
                 />
               );
-            })}
+            })
+          )}
 
-            {isInputVisible ? (
-              <FormInput
-                inputValue={inputValue}
-                inputKey={cardId}
-                onCrossCallback={toggleInput}
-                addButtonCallBack={onSubmit}
-                onSubmitCallback={onSubmit}
-                handleChange={(event) => handleChange(event)}
-              ></FormInput>
-            ) : (
-              <Box
-                onClick={toggleInput}
-                sx={{
-                  background: "white",
-                  padding: 2,
-                  borderRadius: 2,
-                  boxShadow: 1,
-                  cursor: "pointer",
-                }}
-              >
-                <Typography variant="body2">+ Add Another List</Typography>
-              </Box>
-            )}
-          </Container>
-        </Dialog>
-      }
+          {isInputVisible ? (
+            <FormInput
+              inputValue={inputValue}
+              inputKey={cardId}
+              onCrossCallback={toggleInput}
+              addButtonCallBack={onSubmit}
+              onSubmitCallback={onSubmit}
+              handleChange={(event) => handleChange(event)}
+            ></FormInput>
+          ) : (
+            <Box
+              onClick={toggleInput}
+              sx={{
+                background: "white",
+                padding: 2,
+                borderRadius: 2,
+                boxShadow: 1,
+                cursor: "pointer",
+              }}
+            >
+              <Typography variant="body2">+ Add Another List</Typography>
+            </Box>
+          )}
+        </Container>
+      </Dialog>
     </>
   );
 }
