@@ -9,6 +9,8 @@ import { deleteListByListId } from "../data/delete/delete_api_calls";
 import ListCardContainer from "./containers/CardContainer";
 import CircularProgress from "@mui/material/CircularProgress";
 import Snackbar from "@mui/material/Snackbar";
+import ErrorSnackbar from "./components/snackbar/ErrorSnackBar";
+
 function ListScreen() {
   let { boardId } = useParams();
   const [listData, setListData] = useState({});
@@ -16,6 +18,14 @@ function ListScreen() {
   const [addListInputVisibility, setAddListInputVisibility] = useState(false);
   const [newListValue, setNewListValue] = useState("");
   const [loader, setLoader] = useState(true);
+  const [snackbarOpen, setSnackbarOpen] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("hello");
+
+  const handleError = (message) => {
+    // console.log("dsfopsdkposdk")
+    // setErrorMessage("message");
+    // setSnackbarOpen(true);
+  };
 
   const getLists = async () => {
     const response = await getAllListsFromBoard(boardId);
@@ -43,7 +53,7 @@ function ListScreen() {
 
   const addNewList = async () => {
     setAddListInputVisibility(!addListInputVisibility);
-   
+
     const response = await createNewList(newListValue, boardId);
     if (response.error) {
       console.log(response.error);
@@ -66,17 +76,22 @@ function ListScreen() {
   const deleteList = async (listId) => {
     const response = await deleteListByListId(listId);
     if (response.error) {
-      console.log(response.error, "error deleting");
+      handleError();
       return;
     }
     const listDataCopy = listData.filter((item) => item.id != listId);
     setListData(listDataCopy);
   };
   if (loader) {
+
     return <CircularProgress color="success" />;
+  }
+  const handleClose =()=>{
+    setSnackbarOpen(false)
   }
   return (
     <>
+
       <ListScreenAppBar />
 
       <view
