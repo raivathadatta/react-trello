@@ -27,9 +27,6 @@ function CheckListDialogBox({ deleteCardCallBack, name, cardId }) {
   const [checkItems, setCheckItems] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  ///////
-
-  /////
 
   const onClickDeleteCard = () => {
     deleteCardCallBack();
@@ -144,16 +141,15 @@ function CheckListDialogBox({ deleteCardCallBack, name, cardId }) {
             flexDirection: "column",
             alignItems: "center",
             backgroundColor: "lightgrey",
-            // justifyContent: "center",
-            justifyItems: "center",
+           justifyItems: "center",
             padding: 1,
             borderRadius: 1,
             boxShadow: 2,
-            // minHeight: "500px",
-            height: "fitContent",
+   
           }}
         >
-          {loading ? (
+     <Container sx = {{height:'700px'}}>
+     {loading ? (
             <Box sx={{height:"500px",marginTop:"40%"}}>
               <CircularProgress  />
             </Box>
@@ -170,6 +166,7 @@ function CheckListDialogBox({ deleteCardCallBack, name, cardId }) {
               );
             })
           )}
+     </Container>
 
           {isInputVisible ? (
             <FormInput

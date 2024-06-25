@@ -18,7 +18,6 @@ function CardComponent({ listId }) {
       return;
     }
     setCardDetails(response.data);
-    console.log(response.data);
   };
 
   useEffect(() => {

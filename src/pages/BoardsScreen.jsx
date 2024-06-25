@@ -11,7 +11,16 @@ function BoardsScreen() {
   //create a function to get all boards
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
+  const handleError = (message) => {
+    setErrorMessage({ message });
+    setSnackbarOpen(true);
+  };
+  const handleClose = () => {
+    setSnackbarOpen(false);
+  };
   useEffect(() => {
     const getData = async () => {
       const response = await getBoards();

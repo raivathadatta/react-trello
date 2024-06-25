@@ -8,7 +8,6 @@ import FormInput from "./components/appbars/form/FormInput";
 import { deleteListByListId } from "../data/delete/delete_api_calls";
 import ListCardContainer from "./containers/CardContainer";
 import CircularProgress from "@mui/material/CircularProgress";
-import Snackbar from "@mui/material/Snackbar";
 import ErrorSnackbar from "./components/snackbar/ErrorSnackBar";
 
 function ListScreen() {
@@ -18,26 +17,20 @@ function ListScreen() {
   const [addListInputVisibility, setAddListInputVisibility] = useState(false);
   const [newListValue, setNewListValue] = useState("");
   const [loader, setLoader] = useState(true);
-  const [snackbarOpen, setSnackbarOpen] = useState(true);
-  const [errorMessage, setErrorMessage] = useState("hello");
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleError = (message) => {
-    // console.log("dsfopsdkposdk")
-    // setErrorMessage("message");
-    // setSnackbarOpen(true);
+    setErrorMessage({ message });
+    setSnackbarOpen(true);
   };
-
+  const handleClose = () => {
+    setSnackbarOpen(false);
+  };
   const getLists = async () => {
     const response = await getAllListsFromBoard(boardId);
     if (response.error) {
-      console.log(response.error);
-      <Snackbar
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        open={open}
-        onClose={handleClose}
-        message={response.error}
-        key={vertical + horizontal}
-      />;
+      handleError(response.error);
 
       return;
     }
@@ -56,7 +49,7 @@ function ListScreen() {
 
     const response = await createNewList(newListValue, boardId);
     if (response.error) {
-      console.log(response.error);
+      handleError(response.error);
       return;
     }
     const newList = [...listData];
@@ -83,15 +76,18 @@ function ListScreen() {
     setListData(listDataCopy);
   };
   if (loader) {
-
     return <CircularProgress color="success" />;
   }
-  const handleClose =()=>{
-    setSnackbarOpen(false)
-  }
+
   return (
     <>
-
+      <ErrorSnackbar
+        open={snackbarOpen}
+        message={errorMessage}
+        handleClose={() => {
+          setTimeout(() => handleClose(), 300);
+        }}
+      ></ErrorSnackbar>
       <ListScreenAppBar />
 
       <view
