@@ -5,16 +5,25 @@ import { getAllCardsFromListId } from "../../../../data/getData/get_api_calls";
 import { deleteCardById } from "../../../../data/delete/delete_api_calls";
 import { createCard } from "../../../../data/create/create_api_calls";
 import CheckListDialogBox from "../dialogs/CheckItemListDialogBox";
+import ErrorSnackbar from "../../snackbar/ErrorSnackBar";
 
 function CardComponent({ listId }) {
   const [cardDetails, setCardDetails] = useState([]);
   const [cardTitle, setCardTitle] = useState("");
   const [isVisible, setIsVisible] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const handleError = (message) => {
+    setErrorMessage({ message });
+    setSnackbarOpen(true);
+  };
+
 
   const getCards = async () => {
     const response = await getAllCardsFromListId(listId);
     if (response.error) {
-      console.log(response.error);
+      handleError(response.error);
       return;
     }
     setCardDetails(response.data);
@@ -35,7 +44,6 @@ function CardComponent({ listId }) {
   };
 
   const showAddCardInputFled = () => {
-    console.log(cardTitle);
     setIsVisible(true);
   };
 
@@ -44,7 +52,7 @@ function CardComponent({ listId }) {
 
     const response = await createCard(listId, cardTitle);
     if (response.error) {
-      console.log(response.error);
+      handleError(response.error);
       return;
     }
     setCardTitle("");
@@ -54,13 +62,26 @@ function CardComponent({ listId }) {
   const deleteCard = async (cardId) => {
     const response = await deleteCardById(cardId);
     if (response.error) {
-      console.log(response.error);
+      handleError(response.error);
       return;
     }
 
     const newCard = cardDetails.filter((card) => card.id != cardId);
     setCardDetails(newCard);
   };
+
+  if (errorMessage) {
+    return (
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={1000}
+        onClose={() => setTimeout(() => setSnackbarOpen(false), 1000)}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert variant="outlined">{errorMessage}</Alert>
+      </Snackbar>
+    );
+  }
 
   return (
     <>

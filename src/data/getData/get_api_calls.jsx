@@ -19,6 +19,7 @@ const getBoards = async () => {
     const response = await axios.get(
       `https://api.trello.com/1/members/me/boards?key=${Keys.key}&token=${Keys.token}`
     );
+
     return { data: response.data, error: null };
   } catch (e) {
     return { data: null, error: e.message };

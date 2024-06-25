@@ -2,13 +2,12 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getAllListsFromBoard } from "../data/getData/get_api_calls";
 import ListScreenAppBar from "./components/appbars/ListScreenAppBar";
-import { Typography, Box } from "@mui/material";
+import { Typography, Box, Snackbar, Alert } from "@mui/material";
 import { createNewList } from "../data/create/create_api_calls";
 import FormInput from "./components/appbars/form/FormInput";
 import { deleteListByListId } from "../data/delete/delete_api_calls";
 import ListCardContainer from "./containers/CardContainer";
 import CircularProgress from "@mui/material/CircularProgress";
-import ErrorSnackbar from "./components/snackbar/ErrorSnackBar";
 
 function ListScreen() {
   let { boardId } = useParams();
@@ -21,12 +20,10 @@ function ListScreen() {
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleError = (message) => {
-    setErrorMessage({ message });
+    setErrorMessage( message );
     setSnackbarOpen(true);
   };
-  const handleClose = () => {
-    setSnackbarOpen(false);
-  };
+
   const getLists = async () => {
     const response = await getAllListsFromBoard(boardId);
     if (response.error) {
@@ -79,15 +76,21 @@ function ListScreen() {
     return <CircularProgress color="success" />;
   }
 
+  if (errorMessage) {
+    return (
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={1000}
+        onClose={() => setTimeout(() => setSnackbarOpen(false), 1000)}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert variant="outlined">{errorMessage}</Alert>
+      </Snackbar>
+    );
+  }
+
   return (
     <>
-      <ErrorSnackbar
-        open={snackbarOpen}
-        message={errorMessage}
-        handleClose={() => {
-          setTimeout(() => handleClose(), 300);
-        }}
-      ></ErrorSnackbar>
       <ListScreenAppBar />
 
       <view

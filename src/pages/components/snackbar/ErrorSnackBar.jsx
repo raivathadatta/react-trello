@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { Snackbar, Alert } from '@mui/material';
+import React from 'react';
+import { Snackbar } from '@mui/material';
 
 function ErrorSnackbar ({ open, message, handleClose })  {
+
   return (
     <Snackbar
       open={open}

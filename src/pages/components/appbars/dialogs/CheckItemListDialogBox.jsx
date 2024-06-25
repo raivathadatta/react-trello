@@ -18,6 +18,7 @@ import { createCheckList } from "../../../../data/create/create_api_calls";
 // import CheckListDialogBox from "../../../containers/CheckListBox";
 import CheckListBox from "../../../containers/CheckListBox";
 import CircularProgress from "@mui/material/CircularProgress";
+import ErrorSnackbar from "../../snackbar/ErrorSnackBar";
 
 function CheckListDialogBox({ deleteCardCallBack, name, cardId }) {
   const [open, setOpen] = useState(false);
@@ -26,6 +27,16 @@ function CheckListDialogBox({ deleteCardCallBack, name, cardId }) {
   const [inputValue, setInputValue] = useState("");
   const [checkItems, setCheckItems] = useState([]);
   const [loading, setLoading] = useState(false);
+
+
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const handleError = (message) => {
+    setErrorMessage({ message });
+    setSnackbarOpen(true);
+  };
+
 
 
   const onClickDeleteCard = () => {
@@ -48,7 +59,7 @@ function CheckListDialogBox({ deleteCardCallBack, name, cardId }) {
     setInputVisibility(!isInputVisible);
     const response = await createCheckList(cardId, inputValue);
     if (response.error) {
-      console.log(response.error, "error");
+      handleError(response.error);
       return;
     }
 
@@ -100,9 +111,22 @@ function CheckListDialogBox({ deleteCardCallBack, name, cardId }) {
     setCheckItems(checkItems);
     setLoading(false);
   };
+  if (errorMessage) {
+    return (
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={1000}
+        onClose={() => setTimeout(() => setSnackbarOpen(false), 1000)}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert variant="outlined">{errorMessage}</Alert>
+      </Snackbar>
+    );
+  }
 
   return (
     <>
+  
       <Box
         sx={{
           display: "flex",
@@ -141,32 +165,31 @@ function CheckListDialogBox({ deleteCardCallBack, name, cardId }) {
             flexDirection: "column",
             alignItems: "center",
             backgroundColor: "lightgrey",
-           justifyItems: "center",
+            justifyItems: "center",
             padding: 1,
             borderRadius: 1,
             boxShadow: 2,
-   
           }}
         >
-     <Container sx = {{height:'700px'}}>
-     {loading ? (
-            <Box sx={{height:"500px",marginTop:"40%"}}>
-              <CircularProgress  />
-            </Box>
-          ) : (
-            checkList.map((item, index) => {
-              return (
-                <CheckListBox
-                  key={item.id}
-                  item={item}
-                  checkItemList={checkItems[index]}
-                  deleteCallBack={() => deleteCheckList(item)}
-                  cardId={cardId}
-                />
-              );
-            })
-          )}
-     </Container>
+          <Container sx={{ height: "700px" }}>
+            {loading ? (
+              <Box sx={{ height: "500px", marginTop: "40%" }}>
+                <CircularProgress />
+              </Box>
+            ) : (
+              checkList.map((item, index) => {
+                return (
+                  <CheckListBox
+                    key={item.id}
+                    item={item}
+                    checkItemList={checkItems[index]}
+                    deleteCallBack={() => deleteCheckList(item)}
+                    cardId={cardId}
+                  />
+                );
+              })
+            )}
+          </Container>
 
           {isInputVisible ? (
             <FormInput

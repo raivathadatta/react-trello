@@ -14,11 +14,21 @@ import { getCheckItemByListId } from "../../data/getData/get_api_calls";
 import { upDateCheckListStatus } from "../../data/update/update_api_calls";
 import { createCheckItem } from "../../data/create/create_api_calls";
 import FormInput from "../components/appbars/form/FormInput";
+import ErrorSnackbar from "../components/snackbar/ErrorSnackBar";
 
 function ListContainer({ checkItemList, listId, cardId }) {
   const [list, setList] = useState(checkItemList);
   const [addListInputVisibility, setListInputVisibility] = useState(false);
   const [title, setTitle] = useState("");
+
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const handleError = (message) => {
+    setErrorMessage({ message });
+    setSnackbarOpen(true);
+  };
+
 
   const handleToggle = async (checkListId, state) => {
     const status = state == "incomplete" ? "complete" : "incomplete";
@@ -29,10 +39,10 @@ function ListContainer({ checkItemList, listId, cardId }) {
       status
     );
     if (response.error) {
-      console.log(response.error);
+      handleError(response.error);
       return;
     }
-    
+
     const newList = list.map((item) => {
       if (item.id == response.data.id) {
         item.state = response.data.state;
@@ -54,7 +64,7 @@ function ListContainer({ checkItemList, listId, cardId }) {
     event.preventDefault();
     let response = await createCheckItem(listId, title);
     if (response.error) {
-      console.log(response.error);
+      handleError(response.error);
       return;
     }
     setTitle("");
@@ -65,7 +75,7 @@ function ListContainer({ checkItemList, listId, cardId }) {
   const deleteCheckItemList = async (checkItemId) => {
     let response = await deleteCheckList(checkItemId, listId);
     if (response.error) {
-      console.log(response.error);
+      handleError(response.error);
       return;
     }
     const newList = list.filter((checkItem) => checkItem.id != checkItemId);
@@ -75,7 +85,7 @@ function ListContainer({ checkItemList, listId, cardId }) {
   const getCheckItemList = async () => {
     const response = await getCheckItemByListId(listId);
     if (response.error) {
-      console.log(response.error, "error");
+      handleError(response.error);
       return;
     }
     setList(response.data);
@@ -84,49 +94,63 @@ function ListContainer({ checkItemList, listId, cardId }) {
     getCheckItemList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  if (errorMessage) {
+    return (
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={1000}
+        onClose={() => setTimeout(() => setSnackbarOpen(false), 1000)}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert variant="outlined">{errorMessage}</Alert>
+      </Snackbar>
+    );
+  }
 
   return (
     <>
-      <Container sx={{ background: "white", boxShadow: 2, border:1 }}>
+      <Container sx={{ background: "white", boxShadow: 2, border: 1 }}>
         <List
           sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}
         >
-          { list ? list.map((value) => {
-            const labelId = `checkbox-list-label-${value}`;
+          {list
+            ? list.map((value) => {
+                const labelId = `checkbox-list-label-${value}`;
 
-            return (
-              <ListItem
-                key={value}
-                sx={{ margin: 2, border: 2 }}
-                secondaryAction={
-                  <IconButton
-                    edge="end"
-                    aria-label="comments"
-                    onClick={() => deleteCheckItemList(value.id)}
+                return (
+                  <ListItem
+                    key={value}
+                    sx={{ margin: 2, border: 2 }}
+                    secondaryAction={
+                      <IconButton
+                        edge="end"
+                        aria-label="comments"
+                        onClick={() => deleteCheckItemList(value.id)}
+                      >
+                        <MdOutlineDelete />
+                      </IconButton>
+                    }
+                    disablePadding
                   >
-                    <MdOutlineDelete />
-                  </IconButton>
-                }
-                disablePadding
-              >
-                <ListItemButton
-                  onClick={() => handleToggle(value.id, value.state)}
-                  dense
-                >
-                  <ListItemIcon>
-                    <Checkbox
-                      edge="start"
-                      checked={value.state == "incomplete" ? false : true}
-                      tabIndex={-1}
-                      disableRipple
-                      inputProps={{ "aria-labelledby": labelId }}
-                    />
-                  </ListItemIcon>
-                  <ListItemText id={labelId} primary={value.name} />
-                </ListItemButton>
-              </ListItem>
-            );
-          }): ''}
+                    <ListItemButton
+                      onClick={() => handleToggle(value.id, value.state)}
+                      dense
+                    >
+                      <ListItemIcon>
+                        <Checkbox
+                          edge="start"
+                          checked={value.state == "incomplete" ? false : true}
+                          tabIndex={-1}
+                          disableRipple
+                          inputProps={{ "aria-labelledby": labelId }}
+                        />
+                      </ListItemIcon>
+                      <ListItemText id={labelId} primary={value.name} />
+                    </ListItemButton>
+                  </ListItem>
+                );
+              })
+            : ""}
 
           <Box>
             {addListInputVisibility ? (
